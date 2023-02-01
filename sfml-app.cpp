@@ -1,5 +1,8 @@
 //https://www.youtube.com/watch?v=W1_YKBL8m-E
 #include <SFML/Graphics.hpp>
+#include <time.h>
+
+//4:33
 
 using namespace sf;
 
@@ -27,9 +30,49 @@ class PaintGame
 
 PaintGame paintgame;
 
+int k = 0;
+
+class RandTables
+{
+public:
+    int a[25];
+
+    RandTables()
+    {
+        for(int i = 0; i < 25; i++)
+            a[i] = 0;
+
+        for(int i = 0; i < 25; i++)
+        {
+            int tmp = rand() % 25;
+            while(a[tmp] != 0)
+                tmp = rand() % 25;
+
+            a[tmp] =  i + 1;
+        }
+        while (k < 25)
+        {
+            int x = k;
+            int y = 0;
+
+            while (x >= 5)
+            {
+                x -= 5;
+                y++;
+            }
+            paintgame.tables[a[k]-1].setPosition(100 * x, 100 * y);
+
+            k++;
+        }
+    }
+};
+
 int main()
 {
+    srand(time(0));
     RenderWindow window(VideoMode(1000, 500), "Schulte tables");
+
+    RandTables rt;
 
     while(window.isOpen())
     {
@@ -43,7 +86,7 @@ int main()
         window.clear(Color::White);
         for(int i = 0; i < 25; i++)
         {
-            window.draw(paintgame.tables[i]); //1:18
+            window.draw(paintgame.tables[i]); 
         }
         window.display();
     }
