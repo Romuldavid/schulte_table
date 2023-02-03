@@ -5,14 +5,43 @@
 //7:22 created count
 //8:52 true-blue, error-red
 //10:35 add watch
+//11:39 add sound
 
 #include <SFML/Graphics.hpp>
 #include <time.h>
+#include <SFML/Audio.hpp>
 //#include <iostream>
 
 
 
 using namespace sf;
+
+class setSound
+{
+    public:
+        SoundBuffer e, s,  w, t;
+        Sound error, score, win, time;
+        bool stopwin;
+
+        setSound()
+        {
+            e.loadFromFile("Sound/error.ogg");
+            s.loadFromFile("Sound/score.ogg");
+            w.loadFromFile("Sound/win.ogg");
+            t.loadFromFile("Sound/time.ogg");
+
+            error.setBuffer(e);
+            score.setBuffer(s);
+            win.setBuffer(w);
+            time.setBuffer(t);
+
+            time.setLoop(true);
+
+            stopwin = false;
+        }
+};
+
+setSound sound;
 
 class PaintGame
 {
@@ -162,6 +191,8 @@ int main()
     tim.loadFromFile("Paint/time.png");
     Stopwatch watch(tim);
 
+    sound.time.play();
+
     while(window.isOpen())
     {
         Vector2f ts[25];
@@ -187,6 +218,8 @@ int main()
 
                         col = 500;
                         blu = true;
+
+                        sound.score.play();
                         }                
                         else
                             for(int i = 0; i < 5; i++)
@@ -198,6 +231,8 @@ int main()
                                         blu = false;
 
                                         cx = j * 5 + i;
+
+                                        sound.error.play();
                                     }
                 }
         }
@@ -223,6 +258,14 @@ int main()
         if(k == 25 && col == 0)
             for(int i = 0; i < 25; i++)
                 paintgame.tables[i].setColor(Color::Green);
+
+        if(k  == 25 && !sound.stopwin)
+        {
+            sound.win.play();
+            sound.time.stop();
+
+            sound.stopwin = true;
+        }
         
         if(k >= 10)
             score.setPosition(540, 250);
