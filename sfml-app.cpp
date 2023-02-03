@@ -3,6 +3,7 @@
 //4:33 created random class
 //5:48 created looking mouse
 //7:22 created count
+//8:52 true-blue, error-red
 
 #include <SFML/Graphics.hpp>
 #include <time.h>
@@ -93,6 +94,10 @@ int main()
     Sprite chet(ch);
     chet.setPosition(525, 200);
 
+    int col = 0;
+    bool blu = true, stc = false;
+    int cx;
+
     while(window.isOpen())
     {
         Vector2f ts[25];
@@ -111,9 +116,42 @@ int main()
                     Vector2i pos = Mouse::getPosition(window);
 
                     if(pos.x >= ts[k].x && pos.x <= ts[k].x + 100 &&
-                       pos.y >= ts[k].y && pos.y <= ts[k].y + 100)
+                       pos.y >= ts[k].y && pos.y <= ts[k].y + 100){
                        k++;
+
+                       col = 500;
+                       blu = true;
+                    }                
+                    else
+                        for(int i = 0; i < 5; i++)
+                            for(int j = 0; j < 5; j++)
+                                if(pos.x >=  ts[j * 5 + i].x && pos.x <= ts[j * 5 + i].x + 100 &&
+                                   pos.y >=  ts[j * 5 + i].y && pos.y <= ts[j * 5 + i].y + 100)
+                                   {
+                                    col = 500;
+                                    blu = false;
+
+                                    cx = j * 5 + i;
+                                   }
                 }
+        }
+
+        if(col > 0)
+        {
+            col--;
+            stc = true;
+
+            if(blu)
+                paintgame.tables[k - 1].setColor(Color::Blue);
+            else
+                paintgame.tables[cx].setColor(Color::Red);
+        }
+        else if (col == 0 && stc)
+        {
+            if(blu)
+                paintgame.tables[k - 1].setColor(Color::White);
+            else
+                paintgame.tables[cx].setColor(Color::White);
         }
 
         if(k >= 10)
