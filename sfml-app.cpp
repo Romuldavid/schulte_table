@@ -4,6 +4,7 @@
 //5:48 created looking mouse
 //7:22 created count
 //8:52 true-blue, error-red
+//10:35 add watch
 
 #include <SFML/Graphics.hpp>
 #include <time.h>
@@ -75,6 +76,65 @@ public:
     }
 };
 
+class Stopwatch
+{
+    public:
+        Sprite min[2], sec[2], toc;
+        int m[2], s[2], ms;
+
+    Stopwatch(Texture& image)
+    {
+        for(int i = 0; i < 2; i++)
+        {
+            min[i].setTexture(image);
+            sec[i].setTexture(image);
+
+            min[i].setPosition(510 + 30 * i,  25);
+            sec[i].setPosition(580 + 30 * i,  25);
+
+            min[i].setTextureRect(IntRect(0, 0, 24, 38));
+            sec[i].setTextureRect(IntRect(0, 0, 24, 38));
+
+            m[i] = 0;
+            s[i] = 0;
+
+        }
+        toc.setTexture(image);
+        toc.setPosition(560, 25);
+        toc.setTextureRect(IntRect(240, 0, 24, 38));
+    }
+
+    void update()
+    {
+        ms++;
+
+        if(ms >= 1900)
+        {
+            s[1]++;
+            ms = 0;
+        }
+        if(s[1]  == 10)
+        {
+            s[0]++;
+            s[1] = 0;
+        }
+        if(s[0]  == 6)
+        {
+            m[1]++;
+            s[0] = 0;
+        }
+        if(m[1]  == 10)
+        {
+            m[0]++;
+            m[1] = 0;
+        }
+        for (int i = 0; i < 2; i++) {
+			sec[i].setTextureRect(IntRect(24 * s[i], 0, 24, 38));
+			min[i].setTextureRect(IntRect(24 * m[i], 0, 24, 38));
+		}
+    }
+};
+
 int main()
 {
     srand(time(0));
@@ -98,6 +158,10 @@ int main()
     bool blu = true, stc = false;
     int cx;
 
+    Texture tim;
+    tim.loadFromFile("Paint/time.png");
+    Stopwatch watch(tim);
+
     while(window.isOpen())
     {
         Vector2f ts[25];
@@ -115,24 +179,26 @@ int main()
                 {
                     Vector2i pos = Mouse::getPosition(window);
 
-                    if(pos.x >= ts[k].x && pos.x <= ts[k].x + 100 &&
-                       pos.y >= ts[k].y && pos.y <= ts[k].y + 100){
-                       k++;
+                    if(col == 0 && k != 25)
 
-                       col = 500;
-                       blu = true;
-                    }                
-                    else
-                        for(int i = 0; i < 5; i++)
-                            for(int j = 0; j < 5; j++)
-                                if(pos.x >=  ts[j * 5 + i].x && pos.x <= ts[j * 5 + i].x + 100 &&
-                                   pos.y >=  ts[j * 5 + i].y && pos.y <= ts[j * 5 + i].y + 100)
-                                   {
-                                    col = 500;
-                                    blu = false;
+                        if(pos.x >= ts[k].x && pos.x <= ts[k].x + 100 &&
+                        pos.y >= ts[k].y && pos.y <= ts[k].y + 100){
+                        k++;
 
-                                    cx = j * 5 + i;
-                                   }
+                        col = 500;
+                        blu = true;
+                        }                
+                        else
+                            for(int i = 0; i < 5; i++)
+                                for(int j = 0; j < 5; j++)
+                                    if(pos.x >=  ts[j * 5 + i].x && pos.x <= ts[j * 5 + i].x + 100 &&
+                                    pos.y >=  ts[j * 5 + i].y && pos.y <= ts[j * 5 + i].y + 100)
+                                    {
+                                        col = 500;
+                                        blu = false;
+
+                                        cx = j * 5 + i;
+                                    }
                 }
         }
 
@@ -154,6 +220,10 @@ int main()
                 paintgame.tables[cx].setColor(Color::White);
         }
 
+        if(k == 25 && col == 0)
+            for(int i = 0; i < 25; i++)
+                paintgame.tables[i].setColor(Color::Green);
+        
         if(k >= 10)
             score.setPosition(540, 250);
 
@@ -170,6 +240,9 @@ int main()
 
         //std::cout <<  k << "\n";
 
+        if( k != 25)
+            watch.update();
+        
         window.clear(Color::White);
         for(int i = 0; i < 25; i++)
         {
@@ -177,6 +250,13 @@ int main()
         }
         window.draw(score);
         window.draw(chet);
+
+        for(int i = 0; i < 2;  i++)
+        {
+            window.draw(watch.min[i]);
+            window.draw(watch.sec[i]);
+        }
+        window.draw(watch.toc);
         window.display();
     }
 
